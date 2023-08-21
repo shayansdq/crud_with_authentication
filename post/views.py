@@ -16,7 +16,6 @@ logger = logging.getLogger('django')
 class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     queryset = Post.objects.all()
-    permission_classes = PageNumberPagination
     pagination_class = PageNumberPagination
 
     def get_permissions(self):
