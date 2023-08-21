@@ -40,7 +40,11 @@ class WeekRangeListApiViewTest(TestCase):
             'password': '123',
         }
         user_obj = User.objects.get(username='shayan')
+        # print(user_obj.id)
         response = self.client.post(url, data, format='json')
         self.assertIn('token', response.data)
         token_key_db = Token.objects.get(user_id=user_obj.id)
         self.assertEqual(response.data.get('token'), token_key_db.key)
+        # self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # self.assertIn('access', response.data)
+        # self.assertIn('refresh', response.data)
