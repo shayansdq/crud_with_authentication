@@ -1,35 +1,32 @@
+import logging
+
 from django.shortcuts import render
 from rest_framework import viewsets
 from rest_framework import permissions
-
+import post.permissions as custom_permissions
 from post.models import Post
+from post.pagination import PageNumberPagination
 from post.serializers import PostSerializer
 from rest_framework.generics import ListAPIView
 from rest_framework import generics
 
-
-# Create your views here.
-# class ListApiView(ListAPIView, generics.):
-#     serializer_class = PostSerializer
-#     queryset = Post.objects.all()
-# pagination_class = #TODO
+logger = logging.getLogger('django')
 
 
 class PostViewSet(viewsets.ModelViewSet):
     serializer_class = PostSerializer
     queryset = Post.objects.all()
+    permission_classes = PageNumberPagination
+    pagination_class = PageNumberPagination
 
-    # permission_classes =
     def get_permissions(self):
         if self.action == 'retrieve':
-            return [permissions.IsAuthenticated()]
-        elif self.action == 'create':  # TO_DO
-            print('in create')
             return [permissions.IsAuthenticated(), ]
-        elif self.action == 'update' or self.action == 'partial_update':
-            return [permissions.IsAuthenticated(), ]  # You can define your own custom permission class
-        elif self.action == 'destroy':
+        elif self.action == 'create':
             return [permissions.IsAuthenticated(), ]
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            return [permissions.IsAuthenticated(),
+                    custom_permissions.IsOwner()]
         return [permissions.AllowAny()]
 
     def perform_create(self, serializer):
